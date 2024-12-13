@@ -32,6 +32,12 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 		INSERT INTO posts (content, title, user_id, tags)
 		VALUES ($1, $2, $3, $4) RETURNING Id, created_at, updated_at
 	`
+	// Note: Placeholders like $1 ensure:
+	// The database driver treats the inputs as data only, not as part of the SQL query.
+	// Malicious inputs can’t "break out" of the query and execute harmful commands.
+
+	// pq.Array(post.Tags) converts the Go []string (slice) into a PostgreSQL array, which is the expected format for the tags column
+	// $1 corresponds to the first argument after ctx and query
 	err := s.db.QueryRowContext(
 		ctx, query, post.Content, post.Title, post.UserID, pq.Array(post.Tags),
 	).Scan(&post.ID, &post.CreatedAt, &post.UpdatedAt)
