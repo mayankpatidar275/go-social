@@ -7,12 +7,14 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/mayankpatidar275/go-social/internal/store"
 )
 
 // This file will have the applicaion
 
 type applicaion struct {
 	config config
+	store  store.Storage
 }
 
 type config struct {
@@ -35,17 +37,17 @@ func (app *applicaion) mount() http.Handler {
 
 	// Grouping the endpoints in logical way and using middleware(easy with this library)
 
-	r.Route("/v1", func (r chi.Router)  {
+	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 	})
 
-	return r;
+	return r
 }
 
 func (app *applicaion) run(mux http.Handler) error {
 
 	srv := &http.Server{
-		Addr: app.config.addr,
+		Addr:    app.config.addr,
 		Handler: mux,
 	}
 
