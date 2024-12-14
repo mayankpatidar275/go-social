@@ -35,6 +35,11 @@ func main() {
 	// Our handlers will receive the storage
 	store := store.NewStorage(db)
 
+	// Note:
+	// Type: application is the blueprint (no memory used until instantiated).
+	// Value: application{} creates the actual object in memory.
+	// Pointer: &application{} points to the memory location of the created object.
+
 	app := &applicaion{
 		config: cfg,
 		store:  store,
