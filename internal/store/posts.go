@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/lib/pq"
 )
@@ -41,10 +42,43 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	err := s.db.QueryRowContext(
 		ctx, query, post.Content, post.Title, post.UserID, pq.Array(post.Tags),
 	).Scan(&post.ID, &post.CreatedAt, &post.UpdatedAt)
+	// post.ID is an integer value.
+	// &post.ID is the address of the ID field within the Post struct.
+	// Note: &post will be the address of the pointer post
+	// fmt.Println(post.ID)   // Equivalent to (*post).ID // pointer to pointer rarely used
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// I tried it by sending the post pointer as argument instead of returning the pointer by creating the post here.
+func (s *PostStore) GetByID(ctx context.Context, id int64) (*Post, error) {
+	// instead of this SELECT * FROM posts mention everything explicitly is better instead of implicit.
+	query := `
+	SELECT id, user_id, title, content, created_at, updated_at, tags
+	FROM posts
+	WHERE id = $1
+	`
+	var post Post
+	if err := s.db.QueryRowContext(ctx, query, id).Scan(
+		//should be in same order as select query
+		&post.ID,
+		&post.UserID,
+		&post.Title,
+		&post.Content,
+		&post.CreatedAt,
+		&post.UpdatedAt,
+		pq.Array(&post.Tags),
+	); err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &post, nil
 }
