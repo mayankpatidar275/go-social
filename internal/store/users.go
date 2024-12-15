@@ -26,7 +26,7 @@ func (s *UserStore) Create(ctx context.Context, user *User) error {
 	defer cancel()
 
 	err := s.db.QueryRowContext(
-		ctx, query, user.Username, user.Email,
+		ctx, query, user.Username, user.Password, user.Email,
 	).Scan(
 		&user.ID,
 		&user.CreatedAt,
