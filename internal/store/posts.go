@@ -12,14 +12,17 @@ import (
 // Here I kept the model tight with the storage fetching
 
 type Post struct {
-	ID        int64    `json:"id"`
-	Content   string   `json:"content"`
-	Title     string   `json:"title"`
-	UserID    int64    `json:"user_id"`
-	Tags      []string `json:"tags"`
-	CreatedAt string   `json:"created_at"`
-	UpdatedAt string   `json:"updated_at"`
+	ID        int64     `json:"id"`
+	Content   string    `json:"content"`
+	Title     string    `json:"title"`
+	UserID    int64     `json:"user_id"`
+	Tags      []string  `json:"tags"`
+	CreatedAt string    `json:"created_at"`
+	UpdatedAt string    `json:"updated_at"`
+	Comments  []Comment `json:"comments"`
 }
+
+// instead of adding Comments in Post struct we can make a seperate struct like PostWithMetaData.
 
 type PostStore struct {
 	db *sql.DB
@@ -62,6 +65,7 @@ func (s *PostStore) GetByID(ctx context.Context, id int64) (*Post, error) {
 	FROM posts
 	WHERE id = $1
 	`
+	// We are not including comments(by using left join here) with this query because it might be a perfomance bottleneck. We might need post without comments in some cases.
 	var post Post
 	if err := s.db.QueryRowContext(ctx, query, id).Scan(
 		//should be in same order as select query
