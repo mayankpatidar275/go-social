@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/mayankpatidar275/go-social/docs" // This is required to generate swagger docs
 	"github.com/mayankpatidar275/go-social/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2" // http-swagger middleware
+	"go.uber.org/zap"
 )
 
 // This file will have the applicaion
@@ -18,6 +18,7 @@ import (
 type applicaion struct {
 	config config
 	store  store.Storage
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -95,7 +96,7 @@ func (app *applicaion) run(mux http.Handler) error {
 		Handler: mux,
 	}
 
-	log.Printf("Server started at %s", app.config.addr)
+	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.env)
 
 	return srv.ListenAndServe()
 }
