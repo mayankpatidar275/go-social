@@ -70,6 +70,7 @@ func (app *applicaion) mount() http.Handler {
 				r.Put("/unfollow", app.unfollowUserHandler)
 			})
 
+			r.Get("/feed", app.getUserFeedHandler)
 		})
 	})
 

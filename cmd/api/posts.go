@@ -174,3 +174,8 @@ func getPostFromCtx(r *http.Request) *store.Post {
 	post, _ := r.Context().Value(postCtx).(*store.Post)
 	return post
 }
+
+// Note: The .(*store.User) part is a type assertion, which means, "I expect this value to be of type *store.User."
+// If the assertion fails (the value isn't of the expected type), it returns nil as the second return value, and the _ ignores it.
+// The _ in user, _ ignores the second return value (ok), which is a boolean indicating whether the type assertion succeeded.
+// A pointer can be nil, allowing you to signify "no value" or "not found."
