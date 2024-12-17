@@ -15,15 +15,17 @@ var (
 
 type Storage struct {
 	Posts interface {
-		Create(context.Context, *Post) error
 		GetByID(context.Context, int64) (*Post, error)
+		Create(context.Context, *Post) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Post) error
 		GetUserFeed(context.Context, int64, PaginatedFeedQuery) ([]PostWithMetaData, error)
 	}
 	Users interface {
 		GetByID(context.Context, int64) (*User, error)
-		Create(context.Context, *User) error
+		Create(context.Context, *sql.Tx, *User) error
+		CreateAndInvite(ctx context.Context, user *User, token string, exp time.Duration) error
+		Activate(context.Context, string) error
 	}
 	Comments interface {
 		Create(context.Context, *Comment) error
@@ -31,7 +33,7 @@ type Storage struct {
 	}
 	Followers interface {
 		Follow(ctx context.Context, followerID, userID int64) error
-		Unfollow(ctx context.Context, followerID, userId int64) error
+		Unfollow(ctx context.Context, followerID, userID int64) error
 	}
 }
 
@@ -43,4 +45,18 @@ func NewStorage(db *sql.DB) Storage {
 		Comments:  &CommentStore{db},
 		Followers: &FollowerStore{db},
 	}
+}
+
+func withTx(db *sql.DB, ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
