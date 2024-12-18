@@ -12,6 +12,7 @@ import (
 	"github.com/mayankpatidar275/go-social/internal/auth"
 	"github.com/mayankpatidar275/go-social/internal/mailer"
 	"github.com/mayankpatidar275/go-social/internal/store"
+	"github.com/mayankpatidar275/go-social/internal/store/cache"
 	httpSwagger "github.com/swaggo/http-swagger/v2" // http-swagger middleware
 	"go.uber.org/zap"
 )
@@ -21,6 +22,7 @@ import (
 type applicaion struct {
 	config        config
 	store         store.Storage
+	cacheStorage  cache.Storage
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator
@@ -34,8 +36,15 @@ type config struct {
 	mail        mailConfig
 	frontendURL string
 	auth        authConfig
+	redisCfg    redisConfig
 }
 
+type redisConfig struct {
+	addr    string
+	pw      string
+	db      int
+	enabled bool
+}
 type authConfig struct {
 	basic basicConfig
 	token tokenConfig
