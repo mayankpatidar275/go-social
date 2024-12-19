@@ -7,6 +7,7 @@ import (
 	"github.com/mayankpatidar275/go-social/internal/db"
 	"github.com/mayankpatidar275/go-social/internal/env"
 	"github.com/mayankpatidar275/go-social/internal/mailer"
+	"github.com/mayankpatidar275/go-social/internal/ratelimiter"
 	"github.com/mayankpatidar275/go-social/internal/store"
 	"go.uber.org/zap"
 )

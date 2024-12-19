@@ -16,6 +16,7 @@ import (
 	"github.com/mayankpatidar275/go-social/docs" // This is required to generate swagger docs
 	"github.com/mayankpatidar275/go-social/internal/auth"
 	"github.com/mayankpatidar275/go-social/internal/mailer"
+	"github.com/mayankpatidar275/go-social/internal/ratelimiter"
 	"github.com/mayankpatidar275/go-social/internal/store"
 	"github.com/mayankpatidar275/go-social/internal/store/cache"
 	httpSwagger "github.com/swaggo/http-swagger/v2" // http-swagger middleware
